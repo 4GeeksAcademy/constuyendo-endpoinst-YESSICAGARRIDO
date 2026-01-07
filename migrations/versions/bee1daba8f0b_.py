@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 444ffb6cb8bb
-Revises: a5cffa318ac2
-Create Date: 2026-01-07 00:40:08.136632
+Revision ID: bee1daba8f0b
+Revises: 
+Create Date: 2026-01-07 13:47:36.510119
 
 """
 from alembic import op
@@ -10,8 +10,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '444ffb6cb8bb'
-down_revision = 'a5cffa318ac2'
+revision = 'bee1daba8f0b'
+down_revision = None
 branch_labels = None
 depends_on = None
 
@@ -22,7 +22,7 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(length=50), nullable=False),
     sa.Column('director', sa.String(length=100), nullable=False),
-    sa.Column('created', sa.String(length=100), nullable=False),
+    sa.Column('created', sa.Date(), nullable=False),
     sa.Column('edited', sa.Date(), nullable=False),
     sa.Column('release_date', sa.Date(), nullable=False),
     sa.PrimaryKeyConstraint('id')
@@ -32,7 +32,7 @@ def upgrade():
     sa.Column('firstname', sa.String(length=50), nullable=False),
     sa.Column('lastname', sa.String(length=50), nullable=False),
     sa.Column('specie', sa.String(length=50), nullable=False),
-    sa.Column('created', sa.String(length=100), nullable=False),
+    sa.Column('created', sa.Date(), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('planet',
@@ -46,6 +46,18 @@ def upgrade():
     sa.Column('edited', sa.Date(), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
+    op.create_table('user',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('username', sa.String(length=50), nullable=False),
+    sa.Column('firstname', sa.String(length=50), nullable=False),
+    sa.Column('lastname', sa.String(length=50), nullable=False),
+    sa.Column('email', sa.String(length=120), nullable=False),
+    sa.Column('password', sa.String(length=255), nullable=False),
+    sa.Column('is_active', sa.Boolean(), nullable=False),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('email'),
+    sa.UniqueConstraint('username')
+    )
     op.create_table('vehicle',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(length=50), nullable=False),
@@ -55,77 +67,58 @@ def upgrade():
     sa.Column('edited', sa.Date(), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_table('favorite_film',
-    sa.Column('user_id', sa.Integer(), nullable=False),
-    sa.Column('film_id', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['film_id'], ['film.id'], ),
-    sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
-    sa.PrimaryKeyConstraint('user_id', 'film_id'),
-    sa.UniqueConstraint('user_id', 'film_id', name='uq_user_film')
-    )
-    op.create_table('filmplanet',
+    op.create_table('FilmPlanet',
+    sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('film_id', sa.Integer(), nullable=False),
     sa.Column('planet_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['film_id'], ['film.id'], ),
     sa.ForeignKeyConstraint(['planet_id'], ['planet.id'], ),
-    sa.PrimaryKeyConstraint('film_id', 'planet_id'),
-    sa.UniqueConstraint('film_id', 'planet_id', name='up_film_planet')
+    sa.PrimaryKeyConstraint('id')
     )
-    op.create_table('filmvehicle',
+    op.create_table('FilmVehicles',
+    sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('film_id', sa.Integer(), nullable=False),
     sa.Column('vehicle_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['film_id'], ['film.id'], ),
     sa.ForeignKeyConstraint(['vehicle_id'], ['vehicle.id'], ),
-    sa.PrimaryKeyConstraint('film_id', 'vehicle_id'),
-    sa.UniqueConstraint('film_id', 'vehicle_id', name='up_film_vehicle')
+    sa.PrimaryKeyConstraint('id')
     )
-    op.create_table('people_favorite',
-    sa.Column('user_id', sa.Integer(), nullable=False),
-    sa.Column('people_id', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['people_id'], ['people.id'], ),
-    sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
-    sa.PrimaryKeyConstraint('user_id', 'people_id'),
-    sa.UniqueConstraint('user_id', 'people_id', name='uq_user_people')
-    )
-    op.create_table('peoplefilm',
+    op.create_table('PeopleFilm',
+    sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('film_id', sa.Integer(), nullable=False),
     sa.Column('people_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['film_id'], ['film.id'], ),
     sa.ForeignKeyConstraint(['people_id'], ['people.id'], ),
-    sa.PrimaryKeyConstraint('film_id', 'people_id'),
-    sa.UniqueConstraint('film_id', 'people_id', name='up_film_people')
+    sa.PrimaryKeyConstraint('id')
     )
-    with op.batch_alter_table('user', schema=None) as batch_op:
-        batch_op.add_column(sa.Column('username', sa.String(length=50), nullable=False))
-        batch_op.add_column(sa.Column('firstname', sa.String(length=50), nullable=False))
-        batch_op.add_column(sa.Column('lastname', sa.String(length=50), nullable=False))
-        batch_op.alter_column('password',
-               existing_type=sa.VARCHAR(length=80),
-               type_=sa.String(length=255),
-               existing_nullable=False)
-        batch_op.create_unique_constraint(None, ['username'])
-
+    op.create_table('favorite_film',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('user_id', sa.Integer(), nullable=False),
+    sa.Column('film_id', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['film_id'], ['film.id'], ),
+    sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table('people_favorite',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('user_id', sa.Integer(), nullable=False),
+    sa.Column('people_id', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['people_id'], ['people.id'], ),
+    sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
     # ### end Alembic commands ###
 
 
 def downgrade():
     # ### commands auto generated by Alembic - please adjust! ###
-    with op.batch_alter_table('user', schema=None) as batch_op:
-        batch_op.drop_constraint(None, type_='unique')
-        batch_op.alter_column('password',
-               existing_type=sa.String(length=255),
-               type_=sa.VARCHAR(length=80),
-               existing_nullable=False)
-        batch_op.drop_column('lastname')
-        batch_op.drop_column('firstname')
-        batch_op.drop_column('username')
-
-    op.drop_table('peoplefilm')
     op.drop_table('people_favorite')
-    op.drop_table('filmvehicle')
-    op.drop_table('filmplanet')
     op.drop_table('favorite_film')
+    op.drop_table('PeopleFilm')
+    op.drop_table('FilmVehicles')
+    op.drop_table('FilmPlanet')
     op.drop_table('vehicle')
+    op.drop_table('user')
     op.drop_table('planet')
     op.drop_table('people')
     op.drop_table('film')

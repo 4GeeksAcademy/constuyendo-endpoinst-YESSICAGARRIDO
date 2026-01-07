@@ -8,7 +8,7 @@ from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
-from models import db, User, People, Film, Planet, Vehicle, Favoritefilm, Peoplefavorite
+from models import db, User, People, Film, Planet, Vehicle, FavoriteFilm, PeopleFavorite
 # from models import Person
 
 app = Flask(__name__)
@@ -146,13 +146,12 @@ def get_user_favorite():
 
 @app.route('/user/<int:user_id>/favorite/people/<int:people_id>', methods=['POST'])
 def add_people_favorite(user_id, people_id):
-     
+
     user = User.query.get(user_id)
     if user is None:
         return jsonify({"msg": "User not found"}), 404
 
-    
-    favorite = Peoplefavorite(user_id=user_id, people_id=people_id)
+    favorite = PeopleFavorite(user_id=user_id, people_id=people_id)
 
     db.session.add(favorite)
     db.session.commit()
@@ -162,12 +161,12 @@ def add_people_favorite(user_id, people_id):
 
 @app.route('/user/<int:user_id>/favorite/film/<int:film_id>', methods=['POST'])
 def add_film_favorite(user_id, film_id):
-     
+
     user = User.query.get(user_id)
     if user is None:
         return jsonify({"msg": "User not found"}), 404
 
-    favorite = Favoritefilm(user_id=user_id, film_id=film_id)
+    favorite = FavoriteFilm(user_id=user_id, film_id=film_id)
 
     db.session.add(favorite)
     db.session.commit()
@@ -182,14 +181,13 @@ def delete_favorite_people(user_id, people_id):
     if user is None:
         return jsonify({"msg": "User not found"}), 404
 
-    favorite = Peoplefavorite.query.filter_by(
+    favorite = PeopleFavorite.query.filter_by(
         user_id=user_id, people_id=people_id).first()
     db.session.delete(favorite)
     db.session.commit()
 
     return jsonify({"msg": "favorite remove"}), 200
 
-   
 
 @app.route('/user/<int:user_id>/favorite/film/<int:film_id>', methods=['DELETE'])
 def delete_favorite_film(user_id, film_id):
@@ -198,7 +196,7 @@ def delete_favorite_film(user_id, film_id):
     if user is None:
         return jsonify({"msg": "User not found"}), 404
 
-    favorite = Favoritefilm.query.filter_by(
+    favorite = FavoriteFilm.query.filter_by(
         user_id=user_id, film_id=film_id).first()
     db.session.delete(favorite)
     db.session.commit()
