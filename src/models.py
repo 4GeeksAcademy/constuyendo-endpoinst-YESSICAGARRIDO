@@ -38,6 +38,7 @@ class People(db.Model):
     lastname: Mapped[str] = mapped_column(String(50), nullable=False)
     specie: Mapped[str] = mapped_column(String(50), nullable=False)
     created: Mapped[str] = mapped_column(String(100), nullable=False)
+    
 
     favorites: Mapped [List["Peoplefavorite"]] = relationship(back_populates = "people", cascade = "all, delete-orphan")
     people_films: Mapped [List["Peoplefilm"]] = relationship (back_populates= "people" , cascade= "all, delete-orphan")
@@ -61,6 +62,7 @@ class Film(db.Model):
     created: Mapped[str] = mapped_column(String(100), nullable=False)
     edited: Mapped[Date] = mapped_column( Date, nullable=False)
     release_date: Mapped[Date] = mapped_column( Date, nullable=False)
+    
     
     films_favorites: Mapped [List["Favoritefilm"]] = relationship(back_populates = "film", cascade = "all, delete-orphan")
     films_people: Mapped [List["Peoplefilm"]] = relationship (back_populates="film", cascade= "all, delete-orphan" )
